@@ -126,10 +126,25 @@ app.delete("/api/tasks/:id", (req: Request, res: Response) => {
     success: true,
     message: "Task deleted successfully"
   });
-
-
 })
 
+// Sixth endpoint - GET (Task Statistics)
+app.get("/api/stats", (req: Request, res: Response) => {
+  const total = tasks.length;
+
+  const completedCount = tasks.filter((t) => t.completed).length;
+  const pendingCount = total - completedCount;
+
+  res.json({
+    success: true,
+    data: {
+      total,
+      completed: completedCount,
+      pending: pendingCount
+    },
+    message: "Task stats fetched successfully",
+  });
+});
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello World!');

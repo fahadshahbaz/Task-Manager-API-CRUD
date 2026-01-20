@@ -1,0 +1,27 @@
+meta {
+  name: Update Task
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:3000/api/tasks/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 5a9fdd3f-8ccb-4e95-8451-3a17430e9ec3
+}
+
+body:json {
+  {
+    "title": "Bruno is way cooler than Postman",
+    "completed": true
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

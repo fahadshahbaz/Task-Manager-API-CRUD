@@ -75,6 +75,38 @@ app.get("/api/tasks/:id", (req: Request, res: Response) => {
   })
 })
 
+// Fourth endpoint - PUT (update Task)
+app.put("/api/tasks/:id", (req: Request, res: Response) => {
+  const { title, completed } = req.body;
+
+  // find the task using id
+  const task = tasks.find((t) => t.id === req.params.id);
+
+  if (!task) {
+    return res.status(404).json({
+      success: false,
+      message: "Task not found"
+    });
+  }
+
+  // validation
+  if (typeof title !== "string" || typeof completed !== "boolean") {
+    return res.status(400).json({
+      success: false,
+      messgae: "Invalid Input"
+    });
+  }
+
+  // update the task now
+  task.title = title;
+  task.completed = completed;
+
+  res.json({
+    success: true,
+    messgae: "Task update successfully"
+  });
+});
+
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello World!');
 });

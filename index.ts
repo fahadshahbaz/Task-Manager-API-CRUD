@@ -128,7 +128,7 @@ app.delete("/api/tasks/:id", (req: Request, res: Response) => {
   });
 })
 
-// Sixth endpoint - GET (Task Statistics)
+// Sixth endpoint - GET (Task Stats)
 app.get("/api/stats", (req: Request, res: Response) => {
   const total = tasks.length;
 
@@ -143,6 +143,17 @@ app.get("/api/stats", (req: Request, res: Response) => {
       pending: pendingCount
     },
     message: "Task stats fetched successfully",
+  });
+});
+
+// Final - Global Error Handler
+app.use((err: any, req: Request, res: Response, next: any) => {
+  console.error(err.stack);
+
+  res.status(500).json({
+    success: false,
+    data: null,
+    message: "Internal Server Error - Something went wrong on our side!"
   });
 });
 

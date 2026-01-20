@@ -2,6 +2,8 @@ import express, { Request, Response } from 'express';
 import { v4 as uuidv4 } from "uuid";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
+import path from "path";
+import url from "url";
 
 interface Task {
   id: string;
@@ -25,9 +27,12 @@ const swaggerOptions = {
       version: "1.0.0",
       description: "A simple CRUD API for managing tasks built with TypeScript"
     },
-    servers: [{ url: "http://localhost:3000" }]
+    servers: [
+      { url: "http://localhost:3000", description: "Development server" },
+      { url: "https://" + (process.env.VERCEL_URL || 'localhost:3000'), description: "Production server" }
+    ]
   },
-  apis: [process.cwd() + "/index.ts"],
+  apis: [path.join(path.dirname(url.fileURLToPath(import.meta.url)), "*.{ts,js}")],
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);

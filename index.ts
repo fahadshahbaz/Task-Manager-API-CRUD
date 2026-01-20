@@ -29,7 +29,7 @@ const swaggerOptions = {
     },
     servers: [
       { url: "http://localhost:3000", description: "Development server" },
-      { url: "https://" + (process.env.VERCEL_URL || 'localhost:3000'), description: "Production server" }
+      { url: "https://task-manager-api-crud.vercel.app", description: "Production server" }
     ]
   },
   apis: [path.join(path.dirname(url.fileURLToPath(import.meta.url)), "*.{ts,js}")],

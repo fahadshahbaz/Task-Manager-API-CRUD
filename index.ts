@@ -57,6 +57,24 @@ app.get("/api/tasks", (req: Request, res: Response) => {
   });
 });
 
+// Third endpoint - GET/:id (Get single task with id)
+app.get("/api/tasks/:id", (req: Request, res: Response) => {
+  const task = tasks.find((t) => t.id === req.params.id);
+  if (!task)
+    return res
+      .status(404)
+      .json({
+        success: false,
+        data: null,
+        message: "Task not found"
+      });
+  res.json({
+    success: true,
+    data: task,
+    message: "Task fetched successfully"
+  })
+})
+
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello World!');
 });

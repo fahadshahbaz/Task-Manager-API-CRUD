@@ -14,7 +14,7 @@ const app = express();
 app.use(express.json());
 const port = 3000;
 
-// First endpoint - POST (Create)
+// First endpoint - POST (Create Task)
 app.post('/api/tasks', (req: Request, res: Response) => {
   const { title, completed } = req.body;
 
@@ -40,6 +40,22 @@ app.post('/api/tasks', (req: Request, res: Response) => {
     message: "Task created successfully"
   });
 })
+
+// Second endpoint - GET (Get all the Tasks)
+app.get("/api/tasks", (req: Request, res: Response) => {
+  let result = tasks;
+  // Check if there is title query
+  if (req.query.title) {
+    const search = (req.query.title as string).toLowerCase();
+    result = result.filter((t) => t.title.toLowerCase().includes(search));
+  }
+  res.json({
+    success: true,
+    count: result.length,
+    data: result,
+    message: "Tasks fetched successfully"
+  });
+});
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello World!');

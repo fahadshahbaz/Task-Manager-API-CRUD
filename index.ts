@@ -309,7 +309,14 @@ app.use((err: any, req: Request, res: Response, next: any) => {
 });
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Hello World!');
+  res.send(`
+    <div style="font-family: sans-serif; max-width: 600px; margin: 100px auto; text-align: center;">
+      <h1>Linux is better. 🐧</h1>
+      <p>A TypeScript-powered Task Manager API featuring complete CRUD operations, real-time search/filtering, and instant task statistics.</p>
+      <br />
+      <a href="/api-docs">Access Swagger Docs</a>
+    </div>
+  `);
 });
 
 app.listen(port, () => {

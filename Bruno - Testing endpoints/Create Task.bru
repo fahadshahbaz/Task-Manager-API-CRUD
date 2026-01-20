@@ -1,0 +1,27 @@
+meta {
+  name: Create Task
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3000/api/tasks
+  body: json
+  auth: inherit
+}
+
+params:query {
+  : 
+}
+
+body:json {
+  {
+    "title": "Express.js vs FastApi",
+    "completed": false
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

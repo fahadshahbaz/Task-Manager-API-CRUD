@@ -107,6 +107,30 @@ app.put("/api/tasks/:id", (req: Request, res: Response) => {
   });
 });
 
+// Fifth endpoint - DELETE (delete Task)
+app.delete("/api/tasks/:id", (req: Request, res: Response) => {
+  // find the index of the task
+  const index = tasks.findIndex((t) => t.id === req.params.id);
+
+  // Error handling
+  if (index === -1) {
+    return res.status(404).json({
+      success: false,
+      message: "Task not found"
+    });
+  }
+
+  // remove the task from array
+  tasks.splice(index, 1);
+  res.json({
+    success: true,
+    message: "Task deleted successfully"
+  });
+
+
+})
+
+
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello World!');
 });

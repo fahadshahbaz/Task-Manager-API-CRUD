@@ -1,0 +1,20 @@
+meta {
+  name: Delete a Task
+  type: http
+  seq: 5
+}
+
+delete {
+  url: http://localhost:3000/api/tasks/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: aa3c1272-ab17-4a64-8214-c9e6ce7d247e
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

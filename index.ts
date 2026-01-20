@@ -27,7 +27,7 @@ const swaggerOptions = {
     },
     servers: [{ url: "http://localhost:3000" }]
   },
-  apis: ["./index.ts"],
+  apis: [process.cwd() + "/index.ts"],
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
@@ -311,7 +311,7 @@ app.use((err: any, req: Request, res: Response, next: any) => {
 app.get('/', (req: Request, res: Response) => {
   res.send(`
     <div style="font-family: sans-serif; max-width: 600px; margin: 100px auto; text-align: center;">
-      <h1>Linux is better. 🐧</h1>
+      <h1>Linux is better 🐧</h1>
       <p>A TypeScript-powered Task Manager API featuring complete CRUD operations, real-time search/filtering, and instant task statistics.</p>
       <br />
       <a href="/api-docs">Access Swagger Docs</a>
@@ -319,6 +319,11 @@ app.get('/', (req: Request, res: Response) => {
   `);
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+  });
+}
+
+export default app;
+

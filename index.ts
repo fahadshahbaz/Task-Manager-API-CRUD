@@ -1,5 +1,7 @@
 import express, { Request, Response } from 'express';
 import { v4 as uuidv4 } from "uuid";
+import swaggerUi from "swagger-ui-express";
+import swaggerJsdoc from "swagger-jsdoc";
 
 interface Task {
   id: string;
@@ -14,25 +16,82 @@ const app = express();
 app.use(express.json());
 const port = 3000;
 
-// First endpoint - POST (Create Task)
+// Swagger setup
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Task Manager API - TS Edition",
+      version: "1.0.0",
+      description: "A simple CRUD API for managing tasks built with TypeScript"
+    },
+    servers: [{ url: "http://localhost:3000" }]
+  },
+  apis: ["./index.ts"],
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Task:
+ *       type: object
+ *       required:
+ *         - title
+ *         - completed
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: The auto-generated id of the task
+ *         title:
+ *           type: string
+ *           description: The title of the task
+ *         completed:
+ *           type: boolean
+ *           description: The completion status of the task
+ *       example:
+ *         id: d5fE_asz
+ *         title: Learn Swagger
+ *         completed: false
+ */
+
+/**
+ * @swagger
+ * /api/tasks:
+ *   post:
+ *     summary: Create a new task
+ *     tags: [Tasks]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Task'
+ *     responses:
+ *       201:
+ *         description: The task was successfully created
+ *       400:
+ *         description: Invalid input
+ */
 app.post('/api/tasks', (req: Request, res: Response) => {
   const { title, completed } = req.body;
 
-  // first validate the data, if user sent the right data
   if (typeof title !== "string" || typeof completed !== "boolean") {
     return res.status(400).json({
       success: false,
       message: "Invalid input. 'title' must be a string and 'completed' be a boolean."
     })
   }
-  // create the task object - while you were typing noticed how TS was yelling about missing title and completed :)
+
   const newTask: Task = {
     id: uuidv4(),
     title,
     completed
   };
 
-  // save it to array and send success response
   tasks.push(newTask);
   res.status(201).json({
     success: true,
@@ -41,10 +100,37 @@ app.post('/api/tasks', (req: Request, res: Response) => {
   });
 })
 
-// Second endpoint - GET (Get all the Tasks)
+/**
+ * @swagger
+ * /api/tasks:
+ *   get:
+ *     summary: Returns the list of all the tasks
+ *     tags: [Tasks]
+ *     parameters:
+ *       - in: query
+ *         name: title
+ *         schema:
+ *           type: string
+ *         description: Filter tasks by title
+ *     responses:
+ *       200:
+ *         description: The list of the tasks
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 count:
+ *                   type: integer
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Task'
+ */
 app.get("/api/tasks", (req: Request, res: Response) => {
   let result = tasks;
-  // Check if there is title query
   if (req.query.title) {
     const search = (req.query.title as string).toLowerCase();
     result = result.filter((t) => t.title.toLowerCase().includes(search));
@@ -57,7 +143,29 @@ app.get("/api/tasks", (req: Request, res: Response) => {
   });
 });
 
-// Third endpoint - GET/:id (Get single task with id)
+/**
+ * @swagger
+ * /api/tasks/{id}:
+ *   get:
+ *     summary: Get the task by id
+ *     tags: [Tasks]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The task id
+ *     responses:
+ *       200:
+ *         description: The task description by id
+ *         contents:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Task'
+ *       404:
+ *         description: The task was not found
+ */
 app.get("/api/tasks/:id", (req: Request, res: Response) => {
   const task = tasks.find((t) => t.id === req.params.id);
   if (!task)
@@ -75,11 +183,35 @@ app.get("/api/tasks/:id", (req: Request, res: Response) => {
   })
 })
 
-// Fourth endpoint - PUT (update Task)
+/**
+ * @swagger
+ * /api/tasks/{id}:
+ *   put:
+ *     summary: Update the task by the id
+ *     tags: [Tasks]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The task id
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Task'
+ *     responses:
+ *       200:
+ *         description: The task was updated
+ *       404:
+ *         description: The task was not found
+ *       400:
+ *         description: Invalid input
+ */
 app.put("/api/tasks/:id", (req: Request, res: Response) => {
   const { title, completed } = req.body;
-
-  // find the task using id
   const task = tasks.find((t) => t.id === req.params.id);
 
   if (!task) {
@@ -89,30 +221,44 @@ app.put("/api/tasks/:id", (req: Request, res: Response) => {
     });
   }
 
-  // validation
   if (typeof title !== "string" || typeof completed !== "boolean") {
     return res.status(400).json({
       success: false,
-      messgae: "Invalid Input"
+      message: "Invalid Input"
     });
   }
 
-  // update the task now
   task.title = title;
   task.completed = completed;
 
   res.json({
     success: true,
-    messgae: "Task update successfully"
+    message: "Task updated successfully"
   });
 });
 
-// Fifth endpoint - DELETE (delete Task)
+/**
+ * @swagger
+ * /api/tasks/{id}:
+ *   delete:
+ *     summary: Remove the task by id
+ *     tags: [Tasks]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The task id
+ *     responses:
+ *       200:
+ *         description: The task was deleted
+ *       404:
+ *         description: The task was not found
+ */
 app.delete("/api/tasks/:id", (req: Request, res: Response) => {
-  // find the index of the task
   const index = tasks.findIndex((t) => t.id === req.params.id);
 
-  // Error handling
   if (index === -1) {
     return res.status(404).json({
       success: false,
@@ -120,7 +266,6 @@ app.delete("/api/tasks/:id", (req: Request, res: Response) => {
     });
   }
 
-  // remove the task from array
   tasks.splice(index, 1);
   res.json({
     success: true,
@@ -128,10 +273,18 @@ app.delete("/api/tasks/:id", (req: Request, res: Response) => {
   });
 })
 
-// Sixth endpoint - GET (Task Stats)
+/**
+ * @swagger
+ * /api/stats:
+ *   get:
+ *     summary: Get statistics of tasks
+ *     tags: [Stats]
+ *     responses:
+ *       200:
+ *         description: General statistics about tasks
+ */
 app.get("/api/stats", (req: Request, res: Response) => {
   const total = tasks.length;
-
   const completedCount = tasks.filter((t) => t.completed).length;
   const pendingCount = total - completedCount;
 
@@ -146,10 +299,8 @@ app.get("/api/stats", (req: Request, res: Response) => {
   });
 });
 
-// Final - Global Error Handler
 app.use((err: any, req: Request, res: Response, next: any) => {
   console.error(err.stack);
-
   res.status(500).json({
     success: false,
     data: null,
